@@ -1,0 +1,42 @@
+name: refund-sweep
+
+on:
+  schedule:
+    # 8am ET = 12:00 UTC (during EDT). Runs daily, well inside CrowdReply's
+    # 72h refund window for anything posted in the previous day.
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: refund-sweep
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refund:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run refund sweep
+        env:
+          CROWDREPLY_API_KEY: ${{ secrets.CROWDREPLY_API_KEY }}
+          CROWDREPLY_PROJECT_ID: ${{ secrets.CROWDREPLY_PROJECT_ID }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python3 refund_bot.py
+
+      - name: Commit log
+        run: |
+          git config user.name "optimal-reddit-bot"
+          git config user.email "bot@optimal-bet.com"
+          if ! git diff --quiet -- log.txt 2>/dev/null; then
+            git add log.txt
+            git commit -m "bot: refund sweep log ($(date -u +%Y-%m-%dT%H:%MZ))" || true
+            git push || true
+          fi

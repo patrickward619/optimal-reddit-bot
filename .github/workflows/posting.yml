@@ -1,0 +1,44 @@
+name: posting-bot
+
+on:
+  schedule:
+    # 9am, 3pm, 8pm ET (13:00, 19:00, 00:00 UTC — 00:00 is 8pm ET during EDT)
+    - cron: "0 13 * * *"
+    - cron: "0 19 * * *"
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: posting-bot
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run posting bot
+        env:
+          CROWDREPLY_API_KEY: ${{ secrets.CROWDREPLY_API_KEY }}
+          CROWDREPLY_PROJECT_ID: ${{ secrets.CROWDREPLY_PROJECT_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python3 reddit_bot.py
+
+      - name: Commit dedup log
+        run: |
+          git config user.name "optimal-reddit-bot"
+          git config user.email "bot@optimal-bet.com"
+          if ! git diff --quiet -- posted.jsonl log.txt processed/ 2>/dev/null; then
+            git add posted.jsonl log.txt processed/ 2>/dev/null || true
+            git commit -m "bot: record posted threads ($(date -u +%Y-%m-%dT%H:%MZ))" || true
+            git push || true
+          fi
