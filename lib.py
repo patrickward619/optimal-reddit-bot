@@ -24,10 +24,62 @@ CLAUDE_MODEL = "claude-sonnet-4-6"
 
 SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL", "")
 
-REDDIT_UA = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                  "AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
-}
+REDDIT_CLIENT_ID = os.environ.get("REDDIT_CLIENT_ID", "")
+REDDIT_CLIENT_SECRET = os.environ.get("REDDIT_CLIENT_SECRET", "")
+REDDIT_USERNAME = os.environ.get("REDDIT_USERNAME", "")
+REDDIT_PASSWORD = os.environ.get("REDDIT_PASSWORD", "")
+REDDIT_UA_STRING = "optimal-bet-bot/0.1 by " + (REDDIT_USERNAME or "anon")
+
+REDDIT_UA = {"User-Agent": REDDIT_UA_STRING}
+
+_reddit_token = {"value": None, "exp": 0}
+
+
+def reddit_oauth_token():
+    """Fetch + cache a Reddit OAuth access token (script-app password grant)."""
+    if _reddit_token["value"] and time.time() < _reddit_token["exp"]:
+        return _reddit_token["value"]
+    if not all([REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET, REDDIT_USERNAME, REDDIT_PASSWORD]):
+        return None
+    import base64
+    auth = base64.b64encode(
+        f"{REDDIT_CLIENT_ID}:{REDDIT_CLIENT_SECRET}".encode()
+    ).decode()
+    data = urllib.parse.urlencode({
+        "grant_type": "password",
+        "username": REDDIT_USERNAME,
+        "password": REDDIT_PASSWORD,
+    }).encode()
+    req = urllib.request.Request(
+        "https://www.reddit.com/api/v1/access_token",
+        data=data,
+        headers={
+            "Authorization": f"Basic {auth}",
+            "User-Agent": REDDIT_UA_STRING,
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=15) as r:
+        resp = json.loads(r.read())
+    _reddit_token["value"] = resp["access_token"]
+    _reddit_token["exp"] = time.time() + resp.get("expires_in", 3600) - 60
+    return resp["access_token"]
+
+
+def reddit_get(path):
+    """GET against oauth.reddit.com if creds are set, else fall back to public JSON."""
+    token = reddit_oauth_token()
+    if token:
+        url = "https://oauth.reddit.com" + path
+        headers = {
+            "Authorization": f"bearer {token}",
+            "User-Agent": REDDIT_UA_STRING,
+        }
+    else:
+        url = "https://www.reddit.com" + path
+        headers = REDDIT_UA
+    return http_get(url, headers=headers)
 
 POSTED_LOG = ROOT / "posted.jsonl"
 RUN_LOG = ROOT / "log.txt"
@@ -259,8 +311,11 @@ def log(msg):
 # ── Reddit helpers ───────────────────────────────────────────────────────────
 
 def fetch_thread(reddit_url):
-    json_url = reddit_url.rstrip("/") + ".json?limit=10&sort=top"
-    data = http_get(json_url, headers=REDDIT_UA)
+    # convert full URL to path + .json suffix for OAuth endpoint
+    from urllib.parse import urlparse
+    parsed = urlparse(reddit_url)
+    path = parsed.path.rstrip("/") + ".json?limit=10&sort=top"
+    data = reddit_get(path)
     post = data[0]["data"]["children"][0]["data"]
     title = post.get("title", "")
     selftext = post.get("selftext", "")
@@ -293,8 +348,7 @@ def fetch_thread(reddit_url):
 
 def fetch_subreddit_new(subreddit, limit=25):
     """Fetch newest posts from a subreddit, return list of post dicts."""
-    url = f"https://www.reddit.com/r/{subreddit}/new.json?limit={limit}"
-    data = http_get(url, headers=REDDIT_UA)
+    data = reddit_get(f"/r/{subreddit}/new.json?limit={limit}")
     posts = []
     for child in data["data"]["children"]:
         if child["kind"] != "t3":
