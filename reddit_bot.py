@@ -78,7 +78,8 @@ QUALIFICATION_THRESHOLD = 7
 # ── CSV (aged) ingestion ─────────────────────────────────────────────────────
 
 def load_aged_candidates():
-    """Load Reddit URLs from all CSVs in inbox/, sorted by traffic desc."""
+    """Load Reddit URLs from all CSVs in inbox/, sorted by traffic desc.
+    Filters to US-targeted threads only (Current top keyword: Country == 'United States')."""
     rows = []
     for csv_path in sorted(glob.glob(str(INBOX_DIR / "*.csv"))):
         with open(csv_path, newline="", encoding="utf-8") as f:
@@ -89,11 +90,18 @@ def load_aged_candidates():
                     continue
                 if r.get("Status", "") == "Lost":
                     continue
+                if r.get("Current top keyword: Country", "") != "United States":
+                    continue
                 try:
                     traffic = int(r.get("Current traffic") or 0)
                 except ValueError:
                     traffic = 0
-                rows.append({"url": url, "traffic": traffic, "source": "aged"})
+                rows.append({
+                    "url": url,
+                    "traffic": traffic,
+                    "source": "aged",
+                    "keyword": r.get("Current top keyword") or "",
+                })
     rows.sort(key=lambda r: r["traffic"], reverse=True)
     return rows
 
@@ -229,6 +237,10 @@ def run():
     aged = load_aged_candidates()
     fresh = load_fresh_candidates()
     log(f"aged candidates: {len(aged)}   fresh candidates: {len(fresh)}")
+    log("aged top 5: " + " | ".join(
+        f"{a['traffic']}/mo {a.get('keyword','')[:25]}" for a in aged[:5]))
+    log("fresh top 5: " + " | ".join(
+        f"r/{f.get('sub','?')}:{f.get('score','?')}up" for f in fresh[:5]))
 
     n_fresh = max(1, int(TARGET_PER_RUN * FRESH_SHARE))
     n_aged = TARGET_PER_RUN - n_fresh
