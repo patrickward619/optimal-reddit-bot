@@ -297,23 +297,15 @@ def run():
             log(f"  skip {url}: reply contained URL")
             continue
 
-        # Post it
+        # Post it (bundle upvote order so it auto-fires once CrowdReply publishes)
+        UPVOTE_QTY = 12
         try:
-            task_id = cr.create_comment(url, reply)
-            log(f"  POSTED task={task_id} r/{thread['subreddit']}")
+            task_id = cr.create_comment(url, reply, upvote_quantity=UPVOTE_QTY)
+            log(f"  POSTED task={task_id} r/{thread['subreddit']} (upvotes={UPVOTE_QTY} queued)")
+            qty = UPVOTE_QTY
         except Exception as e:
             log(f"  FAIL post {url}: {e}")
             continue
-
-        # Buy upvotes
-        try:
-            top_upvotes = cr.get_top_upvotes(task_id)
-            qty = top_upvotes + 8
-            cr.buy_upvotes(task_id, qty)
-            log(f"  ordered {qty} upvotes (top={top_upvotes})")
-        except Exception as e:
-            log(f"  upvotes failed task={task_id}: {e}")
-            qty = 0
 
         entry = {
             "url": url,

@@ -176,22 +176,26 @@ class CrowdReply:
     def get_task(self, task_id):
         return http_get(f"{CROWDREPLY_BASE}/tasks/{task_id}", headers=self.headers)
 
-    def create_comment(self, thread_url, content):
-        code, data = http_post(
-            f"{CROWDREPLY_BASE}/tasks",
-            {
-                "taskData": {
-                    "taskType": "comment",
-                    "type": "RedditCommentTask",
-                    "platform": "reddit",
-                    "brand": CROWDREPLY_BRAND_ID,
-                    "project": self.project_id,
-                    "content": content,
-                    "threadUrl": thread_url,
-                }
-            },
-            headers=self.headers,
-        )
+    def create_comment(self, thread_url, content, upvote_quantity=12):
+        """Create comment task. If upvote_quantity > 0, bundles an upvote order
+        that fires automatically once CrowdReply publishes the comment."""
+        body = {
+            "taskData": {
+                "taskType": "comment",
+                "type": "RedditCommentTask",
+                "platform": "reddit",
+                "brand": CROWDREPLY_BRAND_ID,
+                "project": self.project_id,
+                "content": content,
+                "threadUrl": thread_url,
+            }
+        }
+        if upvote_quantity > 0:
+            body["initialUpvotesOrder"] = {
+                "quantity": upvote_quantity,
+                "delivery": {"upvotesPerInterval": 1, "intervalUnit": "10_minutes"},
+            }
+        code, data = http_post(f"{CROWDREPLY_BASE}/tasks", body, headers=self.headers)
         if code >= 400:
             raise RuntimeError(f"CrowdReply create_comment {code}: {data}")
         return data["newTask"]["_id"]
