@@ -1,0 +1,40 @@
+name: discover-evergreen
+
+on:
+  schedule:
+    # Sundays 11:00 UTC = 7am ET. Runs before Sunday's first posting cron.
+    - cron: "0 11 * * 0"
+  workflow_dispatch:
+
+concurrency:
+  group: discover
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run discovery
+        env:
+          SCRAPERAPI_KEY: ${{ secrets.SCRAPERAPI_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python3 discover.py
+
+      - name: Commit refreshed CSV
+        run: |
+          git config user.name "optimal-reddit-bot"
+          git config user.email "bot@optimal-bet.com"
+          if ! git diff --quiet -- inbox/_reddit_discovery.csv 2>/dev/null; then
+            git add inbox/_reddit_discovery.csv log.txt
+            git commit -m "discover: refresh evergreen Reddit threads ($(date -u +%Y-%m-%d))" || true
+            git push || true
+          fi
