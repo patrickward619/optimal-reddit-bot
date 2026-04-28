@@ -1,0 +1,9 @@
+2026-04-28T14:48:51.318428+00:00  === discover run start ===
+2026-04-28T14:49:12.029465+00:00    r/evbetting: 30 matches added
+2026-04-28T14:49:31.773354+00:00    r/positiveevbetting: 0 matches added
+2026-04-28T14:49:37.893692+00:00    r/arbitragebetting: 30 matches added
+2026-04-28T14:49:45.628305+00:00    r/algobetting: 26 matches added
+2026-04-28T14:49:50.723578+00:00    fetch failed for r/dfsports: HTTP Error 404: Not Found
+2026-04-28T14:49:58.178242+00:00    r/sportsbettingpicks: 3 matches added
+2026-04-28T14:50:07.492708+00:00    r/sportsbetting: 1 matches added
+2026-04-28T14:50:09.493800+00:00  === discover end: 90 threads written to _reddit_discovery.csv ===
