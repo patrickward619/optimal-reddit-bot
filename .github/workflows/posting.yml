@@ -36,9 +36,15 @@ jobs:
 
       - name: Commit dedup log
         run: |
+          echo "=== state files in workspace ==="
+          ls -la posted.jsonl log.txt processed/ 2>&1 || true
+          echo "=== git status ==="
+          git status --short
           git config user.name "optimal-reddit-bot"
           git config user.email "bot@optimal-bet.com"
-          git add posted.jsonl log.txt processed/ 2>/dev/null || true
+          git add -A posted.jsonl log.txt processed/ 2>&1 || true
+          echo "=== git status after add ==="
+          git status --short
           if ! git diff --cached --quiet; then
             git commit -m "bot: record posted threads ($(date -u +%Y-%m-%dT%H:%MZ))"
             git push
