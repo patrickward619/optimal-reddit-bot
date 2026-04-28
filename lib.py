@@ -87,15 +87,27 @@ RUN_LOG = ROOT / "log.txt"
 
 # ── HTTP helpers ─────────────────────────────────────────────────────────────
 
+DEFAULT_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+              "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+
+
+def _with_ua(headers):
+    h = dict(headers or {})
+    h.setdefault("User-Agent", DEFAULT_UA)
+    h.setdefault("Accept", "application/json, text/plain, */*")
+    h.setdefault("Accept-Language", "en-US,en;q=0.9")
+    return h
+
+
 def http_get(url, headers=None, timeout=20):
-    req = urllib.request.Request(url, headers=headers or {})
+    req = urllib.request.Request(url, headers=_with_ua(headers))
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read())
 
 
 def http_post(url, body, headers=None, timeout=20):
     data = json.dumps(body).encode()
-    h = {"Content-Type": "application/json", **(headers or {})}
+    h = _with_ua({"Content-Type": "application/json", **(headers or {})})
     req = urllib.request.Request(url, data=data, headers=h, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
