@@ -24,62 +24,18 @@ CLAUDE_MODEL = "claude-sonnet-4-6"
 
 SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL", "")
 
-REDDIT_CLIENT_ID = os.environ.get("REDDIT_CLIENT_ID", "")
-REDDIT_CLIENT_SECRET = os.environ.get("REDDIT_CLIENT_SECRET", "")
-REDDIT_USERNAME = os.environ.get("REDDIT_USERNAME", "")
-REDDIT_PASSWORD = os.environ.get("REDDIT_PASSWORD", "")
-REDDIT_UA_STRING = "optimal-bet-bot/0.1 by " + (REDDIT_USERNAME or "anon")
-
-REDDIT_UA = {"User-Agent": REDDIT_UA_STRING}
-
-_reddit_token = {"value": None, "exp": 0}
-
-
-def reddit_oauth_token():
-    """Fetch + cache a Reddit OAuth access token (script-app password grant)."""
-    if _reddit_token["value"] and time.time() < _reddit_token["exp"]:
-        return _reddit_token["value"]
-    if not all([REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET, REDDIT_USERNAME, REDDIT_PASSWORD]):
-        return None
-    import base64
-    auth = base64.b64encode(
-        f"{REDDIT_CLIENT_ID}:{REDDIT_CLIENT_SECRET}".encode()
-    ).decode()
-    data = urllib.parse.urlencode({
-        "grant_type": "password",
-        "username": REDDIT_USERNAME,
-        "password": REDDIT_PASSWORD,
-    }).encode()
-    req = urllib.request.Request(
-        "https://www.reddit.com/api/v1/access_token",
-        data=data,
-        headers={
-            "Authorization": f"Basic {auth}",
-            "User-Agent": REDDIT_UA_STRING,
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        method="POST",
-    )
-    with urllib.request.urlopen(req, timeout=15) as r:
-        resp = json.loads(r.read())
-    _reddit_token["value"] = resp["access_token"]
-    _reddit_token["exp"] = time.time() + resp.get("expires_in", 3600) - 60
-    return resp["access_token"]
+SCRAPERAPI_KEY = os.environ.get("SCRAPERAPI_KEY", "")
 
 
 def reddit_get(path):
-    """GET against oauth.reddit.com if creds are set, else fall back to public JSON."""
-    token = reddit_oauth_token()
-    if token:
-        url = "https://oauth.reddit.com" + path
-        headers = {
-            "Authorization": f"bearer {token}",
-            "User-Agent": REDDIT_UA_STRING,
-        }
-    else:
-        url = "https://www.reddit.com" + path
-        headers = REDDIT_UA
-    return http_get(url, headers=headers)
+    """GET reddit JSON via ScraperAPI (residential IPs not blocked by Reddit).
+    Falls back to direct fetch if SCRAPERAPI_KEY isn't set (works locally only)."""
+    target = "https://www.reddit.com" + path
+    if SCRAPERAPI_KEY:
+        url = ("https://api.scraperapi.com/?api_key="
+               + SCRAPERAPI_KEY + "&url=" + urllib.parse.quote(target, safe=""))
+        return http_get(url, timeout=60)
+    return http_get(target)
 
 POSTED_LOG = ROOT / "posted.jsonl"
 RUN_LOG = ROOT / "log.txt"
