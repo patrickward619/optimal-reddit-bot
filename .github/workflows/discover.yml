@@ -33,8 +33,10 @@ jobs:
         run: |
           git config user.name "optimal-reddit-bot"
           git config user.email "bot@optimal-bet.com"
-          if ! git diff --quiet -- inbox/_reddit_discovery.csv 2>/dev/null; then
-            git add inbox/_reddit_discovery.csv log.txt
-            git commit -m "discover: refresh evergreen Reddit threads ($(date -u +%Y-%m-%d))" || true
-            git push || true
+          git add inbox/_reddit_discovery.csv log.txt 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "discover: refresh evergreen Reddit threads ($(date -u +%Y-%m-%d))"
+            git push
+          else
+            echo "No changes to commit."
           fi

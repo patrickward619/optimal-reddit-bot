@@ -38,8 +38,10 @@ jobs:
         run: |
           git config user.name "optimal-reddit-bot"
           git config user.email "bot@optimal-bet.com"
-          if ! git diff --quiet -- posted.jsonl log.txt processed/ 2>/dev/null; then
-            git add posted.jsonl log.txt processed/ 2>/dev/null || true
-            git commit -m "bot: record posted threads ($(date -u +%Y-%m-%dT%H:%MZ))" || true
-            git push || true
+          git add posted.jsonl log.txt processed/ 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "bot: record posted threads ($(date -u +%Y-%m-%dT%H:%MZ))"
+            git push
+          else
+            echo "No changes to commit."
           fi
