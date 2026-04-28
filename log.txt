@@ -7,3 +7,7 @@
 2026-04-28T14:49:58.178242+00:00    r/sportsbettingpicks: 3 matches added
 2026-04-28T14:50:07.492708+00:00    r/sportsbetting: 1 matches added
 2026-04-28T14:50:09.493800+00:00  === discover end: 90 threads written to _reddit_discovery.csv ===
+2026-04-28T14:56:39.035431+00:00  === refund_bot run start ===
+2026-04-28T14:56:39.958074+00:00  fetched 124 tasks
+2026-04-28T14:56:39.958373+00:00  Refund sweep: 0 refunded ($0), 0 errored, 53 outside 72h window, 27 already refunded, 22 not removed.
+2026-04-28T14:56:40.025967+00:00  === refund_bot run end ===
