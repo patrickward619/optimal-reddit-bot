@@ -18,6 +18,7 @@ ROOT = Path(__file__).parent
 CROWDREPLY_BASE = "https://crowdreply.io/api"
 CROWDREPLY_API_KEY = os.environ.get("CROWDREPLY_API_KEY", "")
 CROWDREPLY_PROJECT_ID = os.environ.get("CROWDREPLY_PROJECT_ID", "")
+CROWDREPLY_BRAND_ID = os.environ.get("CROWDREPLY_BRAND_ID", "69b987e1449642b9bf031930")
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 CLAUDE_MODEL = "claude-sonnet-4-6"
@@ -183,6 +184,7 @@ class CrowdReply:
                     "taskType": "comment",
                     "type": "RedditCommentTask",
                     "platform": "reddit",
+                    "brand": CROWDREPLY_BRAND_ID,
                     "project": self.project_id,
                     "content": content,
                     "threadUrl": thread_url,
@@ -200,9 +202,8 @@ class CrowdReply:
         code, data = http_post(
             f"{CROWDREPLY_BASE}/tasks/{task_id}/upvotes",
             {
-                "delivery": {"upvotesPerInterval": 2, "intervalUnit": "day"},
+                "delivery": {"upvotesPerInterval": 1, "intervalUnit": "10_minutes"},
                 "quantity": quantity,
-                "triggerAt": None,
             },
             headers=self.headers,
         )
