@@ -113,26 +113,33 @@ def build_qualifier_system_prompt():
 
 # ── Claude client ────────────────────────────────────────────────────────────
 
-def claude_complete(system, user, max_tokens=400):
+def claude_complete(system, user, max_tokens=400, max_retries=4):
     if not ANTHROPIC_API_KEY:
         raise RuntimeError("ANTHROPIC_API_KEY not set")
-    code, data = http_post(
-        "https://api.anthropic.com/v1/messages",
-        {
-            "model": CLAUDE_MODEL,
-            "max_tokens": max_tokens,
-            "system": system,
-            "messages": [{"role": "user", "content": user}],
-        },
-        headers={
-            "x-api-key": ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-        },
-        timeout=45,
-    )
-    if code != 200:
+    body = {
+        "model": CLAUDE_MODEL,
+        "max_tokens": max_tokens,
+        "system": system,
+        "messages": [{"role": "user", "content": user}],
+    }
+    headers = {
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+    }
+    backoff = 4
+    for attempt in range(max_retries):
+        code, data = http_post(
+            "https://api.anthropic.com/v1/messages",
+            body, headers=headers, timeout=60,
+        )
+        if code == 200:
+            return data["content"][0]["text"].strip()
+        # retry on rate limit and 5xx
+        if code in (429, 500, 502, 503, 529) and attempt < max_retries - 1:
+            time.sleep(backoff)
+            backoff *= 2
+            continue
         raise RuntimeError(f"Claude API {code}: {data}")
-    return data["content"][0]["text"].strip()
 
 
 # ── CrowdReply client ────────────────────────────────────────────────────────
