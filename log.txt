@@ -19,3 +19,9 @@
 2026-04-29T17:10:24.471631+00:00  fetched 132 tasks
 2026-04-29T17:10:24.471939+00:00  Refund sweep: 0 refunded ($0), 0 errored, 53 outside 72h window, 27 already refunded, 30 not removed.
 2026-04-29T17:10:24.675297+00:00  === refund_bot run end ===
+2026-04-30T13:23:07.494565+00:00  === refund_bot run start ===
+2026-04-30T13:23:08.178271+00:00  fetched 135 tasks
+2026-04-30T13:23:11.158869+00:00    refund 69f0f8660178c31fb917c749 r/positiveevbetting $10: You cannot refund this task. The comment promotes a specific app (Optimal) with a suspicious financial claim ($900 profit) designed to entice clicks, following a pattern typical of affiliate marketing schemes.
+2026-04-30T13:23:14.024662+00:00    refund 69f0cc550178c31fb912cd09 r/positiveevbetting $10: refunded
+2026-04-30T13:23:14.025006+00:00  Refund sweep: 1 refunded ($10), 1 errored, 53 outside 72h window, 27 already refunded, 31 not removed.
+2026-04-30T13:23:14.124998+00:00  === refund_bot run end ===
