@@ -36,3 +36,9 @@
 2026-05-02T12:50:03.369866+00:00  fetched 141 tasks
 2026-05-02T12:50:03.370161+00:00  Refund sweep: 0 refunded ($0), 0 errored, 53 outside 72h window, 30 already refunded, 34 not removed.
 2026-05-02T12:50:03.649412+00:00  === refund_bot run end ===
+2026-05-03T12:50:14.265390+00:00  === refund_bot run start ===
+2026-05-03T12:50:16.214338+00:00  fetched 144 tasks
+2026-05-03T12:50:19.720081+00:00    refund 69f4b61f78e8f82658e20a77 r/positiveevbetting $10: You cannot refund this task. The comment promotes a specific product/service called 'Optimal Bet' with a cheat sheet feature and includes a success claim ($1.8k profit) that appears designed to drive interest and potential affiliate link clicks for that betting tool.
+2026-05-03T12:50:20.822405+00:00    refund 69f3b716423b92967b21191e r/positiveevbetting $10: Instant comment upvotes on a thread older than 30 days is non refundable
+2026-05-03T12:50:20.822765+00:00  Refund sweep: 0 refunded ($0), 2 errored, 54 outside 72h window, 30 already refunded, 34 not removed.
+2026-05-03T12:50:20.974089+00:00  === refund_bot run end ===
