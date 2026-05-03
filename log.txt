@@ -42,3 +42,12 @@
 2026-05-03T12:50:20.822405+00:00    refund 69f3b716423b92967b21191e r/positiveevbetting $10: Instant comment upvotes on a thread older than 30 days is non refundable
 2026-05-03T12:50:20.822765+00:00  Refund sweep: 0 refunded ($0), 2 errored, 54 outside 72h window, 30 already refunded, 34 not removed.
 2026-05-03T12:50:20.974089+00:00  === refund_bot run end ===
+2026-05-03T14:15:40.536810+00:00  === discover run start ===
+2026-05-03T14:15:43.906217+00:00    r/evbetting: 30 matches added
+2026-05-03T14:15:53.557977+00:00    r/positiveevbetting: 1 matches added
+2026-05-03T14:16:01.135744+00:00    r/arbitragebetting: 30 matches added
+2026-05-03T14:16:11.050048+00:00    r/algobetting: 25 matches added
+2026-05-03T14:16:23.069120+00:00    fetch failed for r/dfsports: HTTP Error 404: Not Found
+2026-05-03T14:16:25.918641+00:00    r/sportsbettingpicks: 3 matches added
+2026-05-03T14:16:33.003157+00:00    r/sportsbetting: 1 matches added
+2026-05-03T14:16:35.004275+00:00  === discover end: 90 threads written to _reddit_discovery.csv ===
