@@ -51,3 +51,10 @@
 2026-05-03T14:16:25.918641+00:00    r/sportsbettingpicks: 3 matches added
 2026-05-03T14:16:33.003157+00:00    r/sportsbetting: 1 matches added
 2026-05-03T14:16:35.004275+00:00  === discover end: 90 threads written to _reddit_discovery.csv ===
+2026-05-04T13:24:28.747240+00:00  === refund_bot run start ===
+2026-05-04T13:24:29.455924+00:00  fetched 144 tasks
+2026-05-04T13:24:32.548625+00:00    refund 69f6564d78e8f82658e95734 r/positiveevbetting $10: refunded
+2026-05-04T13:24:35.312345+00:00    refund 69f60621423b92967b67787c r/positiveevbetting $10: You cannot refund this task. The comment promotes a paid betting tool called 'Optimal Bet' and claims personal financial success with it, which appears designed to encourage clicks or purchases through affiliate commission incentives.
+2026-05-04T13:24:38.426460+00:00    refund 69f571e078e8f82658e5930d r/positiveevbetting $10: You cannot refund this task. The comment promotes the 'Optimal Bet app' with a personal success story and specific financial results, which appears designed to drive affiliate link clicks or app downloads for commission purposes.
+2026-05-04T13:24:38.426922+00:00  Refund sweep: 1 refunded ($10), 2 errored, 54 outside 72h window, 30 already refunded, 31 not removed.
+2026-05-04T13:24:38.498985+00:00  === refund_bot run end ===
