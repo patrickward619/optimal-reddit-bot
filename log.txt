@@ -62,3 +62,8 @@
 2026-05-05T13:16:38.165190+00:00  fetched 145 tasks
 2026-05-05T13:16:38.165516+00:00  Refund sweep: 0 refunded ($0), 0 errored, 54 outside 72h window, 31 already refunded, 32 not removed.
 2026-05-05T13:16:38.263771+00:00  === refund_bot run end ===
+2026-05-06T13:47:19.869051+00:00  === refund_bot run start ===
+2026-05-06T13:47:21.991151+00:00  fetched 146 tasks
+2026-05-06T13:47:25.270945+00:00    refund 69f8fdfa199d81dbd5e00b9e r/positiveevbetting $10: refunded
+2026-05-06T13:47:25.271209+00:00  Refund sweep: 1 refunded ($10), 0 errored, 54 outside 72h window, 31 already refunded, 32 not removed.
+2026-05-06T13:47:25.597933+00:00  === refund_bot run end ===
