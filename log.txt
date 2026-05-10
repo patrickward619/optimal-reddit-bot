@@ -88,3 +88,7 @@
 2026-05-10T11:40:30.470593+00:00    fetch failed for r/sportsbettingpicks: HTTP Error 403: Forbidden
 2026-05-10T11:40:30.550079+00:00    fetch failed for r/sportsbetting: HTTP Error 403: Forbidden
 2026-05-10T11:40:30.550461+00:00  === discover end: 0 threads written to _reddit_discovery.csv ===
+2026-05-10T12:57:45.455025+00:00  === refund_bot run start ===
+2026-05-10T12:57:47.574049+00:00  fetched 146 tasks
+2026-05-10T12:57:47.574350+00:00  Refund sweep: 0 refunded ($0), 0 errored, 54 outside 72h window, 32 already refunded, 32 not removed.
+2026-05-10T12:57:47.901600+00:00  === refund_bot run end ===
