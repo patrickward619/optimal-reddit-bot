@@ -79,3 +79,12 @@
 2026-05-09T12:55:56.954976+00:00  fetched 146 tasks
 2026-05-09T12:55:56.955278+00:00  Refund sweep: 0 refunded ($0), 0 errored, 54 outside 72h window, 32 already refunded, 32 not removed.
 2026-05-09T12:55:57.027517+00:00  === refund_bot run end ===
+2026-05-10T11:40:29.808416+00:00  === discover run start ===
+2026-05-10T11:40:29.911916+00:00    fetch failed for r/evbetting: HTTP Error 403: Forbidden
+2026-05-10T11:40:30.032664+00:00    fetch failed for r/positiveevbetting: HTTP Error 403: Forbidden
+2026-05-10T11:40:30.202414+00:00    fetch failed for r/arbitragebetting: HTTP Error 403: Forbidden
+2026-05-10T11:40:30.280575+00:00    fetch failed for r/algobetting: HTTP Error 403: Forbidden
+2026-05-10T11:40:30.390671+00:00    fetch failed for r/dfsports: HTTP Error 403: Forbidden
+2026-05-10T11:40:30.470593+00:00    fetch failed for r/sportsbettingpicks: HTTP Error 403: Forbidden
+2026-05-10T11:40:30.550079+00:00    fetch failed for r/sportsbetting: HTTP Error 403: Forbidden
+2026-05-10T11:40:30.550461+00:00  === discover end: 0 threads written to _reddit_discovery.csv ===
