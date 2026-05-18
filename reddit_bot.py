@@ -33,6 +33,8 @@ from lib import (
     load_posted_urls,
     log,
     record_posted,
+    reddit_search,
+    scraperapi_credits_left,
     slack_notify,
     ROOT,
 )
@@ -42,37 +44,52 @@ from lib import (
 INBOX_DIR = ROOT / "inbox"
 PROCESSED_DIR = ROOT / "processed"
 
-# Tier 1 subs — source fresh threads from /new
+# Tier 1 subs — source fresh threads from /new (vetted permissive)
 FRESH_SUBS = [
     "evbetting",
-    "positiveevbetting",
     "arbitragebetting",
     "algobetting",
-    "dfsports",
     "sportsbettingpicks",
+    "SportsBettingTools",
+    "cantbeatthebookie",
+    "sportsbookcheatcodes",
+    "sharpsports",
+    "Bookies",
+    "parlays",
+    "handicappers",
+    "sportsbettingadvice",
+    "Kalshi",
+    "PolymarketIntel",
+    "RecreationalGambling",
 ]
 
-# Blocklist — never post here even if a CSV contains the URL
-SUB_BLOCKLIST = {"sportsbookadvice", "sportsbookftc"}
+# Blocklist — never post here even if a CSV / search contains the URL
+# r/positiveevbetting had 100% removal rate (11/11) — moved here 2026-05-18
+SUB_BLOCKLIST = {
+    "sportsbookadvice",
+    "sportsbookftc",
+    "positiveevbetting",
+}
 
 # Tier 2 — only post if the thread is old (Ahrefs-ranking evergreen)
 TIER2_SUBS = {"sportsbetting", "sportsbook"}
 
-# Keyword filter for fresh-bucket threads
+# Keyword filter for fresh-bucket + site-wide search threads
 FRESH_KEYWORDS = [
     "oddsjam", "odds jam", "positive ev", "+ev", "positive-ev",
     "line shopping", "line shop", "arbitrage", "arb betting", "arbing",
     "sharp bet", "closing line value", "clv", "outlier bet", "rithmm",
     "props cash", "ev betting", "prizepicks edge", "kalshi sports",
     "polymarket sports", "algo betting", "beat the book", "expected value",
+    "novig", "pikkit", "best betting tool", "best ev betting",
 ]
 
-# Caps
-TARGET_PER_RUN = 4
-DAILY_CAP = 15
-PER_SUB_DAILY_CAP = 2
-FRESH_SHARE = 0.35  # ~35% fresh, ~65% aged per run
-QUALIFICATION_THRESHOLD = 7
+# Caps (tuned 2026-05-18 to lift volume ceiling — Jan ran 14-25 installs/day)
+TARGET_PER_RUN = 8
+DAILY_CAP = 25
+PER_SUB_DAILY_CAP = 4
+FRESH_SHARE = 0.45  # 45% fresh / wide-search, 55% aged
+QUALIFICATION_THRESHOLD = 6
 
 
 # ── CSV (aged) ingestion ─────────────────────────────────────────────────────
@@ -120,13 +137,6 @@ def load_fresh_candidates():
                 continue
             if p["score"] < 3 or p["num_comments"] < 1:
                 continue
-            haystack = (p["title"] + " " + p["selftext"]).lower()
-            if FRESH_SUBS and sub in FRESH_SUBS:
-                # within whitelisted sub — no keyword requirement
-                pass
-            else:
-                if not any(kw in haystack for kw in FRESH_KEYWORDS):
-                    continue
             cands.append({
                 "url": p["url"],
                 "traffic": 0,
@@ -136,9 +146,53 @@ def load_fresh_candidates():
                 "score": p["score"],
             })
         time.sleep(1)  # polite
-    # prioritize moderate-age, moderate-engagement posts
     cands.sort(key=lambda p: (p.get("score", 0) * (1 if p.get("age_hours", 0) < 24 else 0.5)),
                reverse=True)
+    return cands
+
+
+def load_wide_search_candidates():
+    """Site-wide Reddit search for threads mentioning competitor / EV keywords.
+    Captures threads in subs we don't track but where these conversations happen."""
+    queries = [
+        "oddsjam alternative",
+        "best ev betting tool",
+        "outlier vs oddsjam",
+        "positive ev betting app",
+        "line shopping app",
+        "best arbitrage betting",
+        "sharp betting tools",
+        "props cash alternative",
+        "prizepicks edge tool",
+    ]
+    cands = []
+    seen_urls = set()
+    for q in queries:
+        try:
+            posts = reddit_search(q, sort="new", t="month", limit=15)
+        except Exception as e:
+            log(f"  wide search failed for '{q}': {e}")
+            continue
+        for p in posts:
+            url = p["url"]
+            if url in seen_urls:
+                continue
+            seen_urls.add(url)
+            if p["age_hours"] < 2 or p["age_hours"] > 24 * 30:
+                continue
+            if p["score"] < 2:
+                continue
+            cands.append({
+                "url": url,
+                "traffic": 0,
+                "source": "wide",
+                "sub": p["subreddit"],
+                "query": q,
+                "age_hours": p["age_hours"],
+                "score": p["score"],
+            })
+        time.sleep(1)
+    cands.sort(key=lambda p: p.get("score", 0), reverse=True)
     return cands
 
 
@@ -233,19 +287,31 @@ def run():
         slack_notify(f":brake: posting_bot skipped — daily cap {DAILY_CAP} hit")
         return
 
-    # Build candidate queue: fresh + aged, in the right mix
+    # Surface infrastructure health before doing work
+    sa_credits = scraperapi_credits_left()
+    if sa_credits is not None and sa_credits < 100:
+        log(f"WARN ScraperAPI credits low: {sa_credits}")
+        slack_notify(f":warning: ScraperAPI credits low: {sa_credits}. "
+                     "Bot will use Reddit OAuth if configured, otherwise stall.")
+
+    # Build candidate queue: fresh + wide-search + aged
     aged = load_aged_candidates()
     fresh = load_fresh_candidates()
-    log(f"aged candidates: {len(aged)}   fresh candidates: {len(fresh)}")
+    wide = load_wide_search_candidates()
+    log(f"aged candidates: {len(aged)}   fresh candidates: {len(fresh)}   wide candidates: {len(wide)}")
     log("aged top 5: " + " | ".join(
         f"{a['traffic']}/mo {a.get('keyword','')[:25]}" for a in aged[:5]))
     log("fresh top 5: " + " | ".join(
         f"r/{f.get('sub','?')}:{f.get('score','?')}up" for f in fresh[:5]))
+    log("wide top 5: " + " | ".join(
+        f"r/{w.get('sub','?')}:{w.get('score','?')}up [{w.get('query','')[:18]}]" for w in wide[:5]))
 
-    n_fresh = max(1, int(TARGET_PER_RUN * FRESH_SHARE))
+    # Mix: 45% from fresh+wide, 55% aged. Oversample 4x for gate rejections.
+    fresh_pool = fresh + wide
+    random.shuffle(fresh_pool)
+    n_fresh = max(2, int(TARGET_PER_RUN * FRESH_SHARE))
     n_aged = TARGET_PER_RUN - n_fresh
-    queue = (fresh[: n_fresh * 3]) + (aged[: n_aged * 3])  # oversample 3x for gate rejections
-    random.shuffle(fresh[: n_fresh * 3])  # a bit of randomness so same threads don't dominate
+    queue = fresh_pool[: n_fresh * 4] + aged[: n_aged * 4]
 
     posted_this_run = []
     attempts = 0

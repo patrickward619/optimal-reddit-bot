@@ -74,11 +74,20 @@ Only post to these. Others require explicit approval.
 
 **Tier 1 — permissive, on-topic:**
 - r/evbetting
-- r/positiveevbetting
 - r/arbitragebetting
 - r/algobetting
-- r/dfsports
 - r/sportsbettingpicks
+- r/SportsBettingTools
+- r/cantbeatthebookie
+- r/sportsbookcheatcodes
+- r/sharpsports
+- r/Bookies
+- r/parlays
+- r/handicappers
+- r/sportsbettingadvice
+- r/Kalshi
+- r/PolymarketIntel
+- r/RecreationalGambling
 
 **Tier 2 — use sparingly, only for aged/high-rank Ahrefs threads:**
 - r/sportsbetting
@@ -87,6 +96,7 @@ Only post to these. Others require explicit approval.
 **Blocklist (do not post, history of insta-removal):**
 - r/sportsbookadvice
 - r/SportsbookFTC
+- **r/positiveevbetting** (100% removal rate observed 2026-04-28 to 2026-05-05, moved from Tier 1)
 - anything not in the list above
 
 ---

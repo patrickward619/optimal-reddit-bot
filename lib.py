@@ -27,16 +27,74 @@ SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL", "")
 
 SCRAPERAPI_KEY = os.environ.get("SCRAPERAPI_KEY", "")
 
+REDDIT_CLIENT_ID = os.environ.get("REDDIT_CLIENT_ID", "")
+REDDIT_CLIENT_SECRET = os.environ.get("REDDIT_CLIENT_SECRET", "")
+REDDIT_USERNAME = os.environ.get("REDDIT_USERNAME", "")
+REDDIT_PASSWORD = os.environ.get("REDDIT_PASSWORD", "")
+REDDIT_UA_STRING = "optimal-bet-bot/0.2 by " + (REDDIT_USERNAME or "anon")
+
+_reddit_token = {"value": None, "exp": 0}
+
+
+def reddit_oauth_token():
+    """Fetch + cache a Reddit OAuth access token (script-app password grant)."""
+    if _reddit_token["value"] and time.time() < _reddit_token["exp"]:
+        return _reddit_token["value"]
+    if not all([REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET, REDDIT_USERNAME, REDDIT_PASSWORD]):
+        return None
+    import base64
+    auth = base64.b64encode(
+        f"{REDDIT_CLIENT_ID}:{REDDIT_CLIENT_SECRET}".encode()
+    ).decode()
+    data = urllib.parse.urlencode({
+        "grant_type": "password",
+        "username": REDDIT_USERNAME,
+        "password": REDDIT_PASSWORD,
+    }).encode()
+    req = urllib.request.Request(
+        "https://www.reddit.com/api/v1/access_token",
+        data=data,
+        headers={
+            "Authorization": f"Basic {auth}",
+            "User-Agent": REDDIT_UA_STRING,
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=15) as r:
+        resp = json.loads(r.read())
+    _reddit_token["value"] = resp["access_token"]
+    _reddit_token["exp"] = time.time() + resp.get("expires_in", 3600) - 60
+    return resp["access_token"]
+
 
 def reddit_get(path):
-    """GET reddit JSON via ScraperAPI (residential IPs not blocked by Reddit).
-    Falls back to direct fetch if SCRAPERAPI_KEY isn't set (works locally only)."""
+    """GET reddit JSON. Priority: OAuth (free, 60 RPM) → ScraperAPI → direct.
+    OAuth is preferred — works from any IP and free unlimited at scale."""
+    token = reddit_oauth_token()
+    if token:
+        url = "https://oauth.reddit.com" + path
+        return http_get(url, headers={
+            "Authorization": f"bearer {token}",
+            "User-Agent": REDDIT_UA_STRING,
+        }, timeout=30)
     target = "https://www.reddit.com" + path
     if SCRAPERAPI_KEY:
         url = ("https://api.scraperapi.com/?api_key="
                + SCRAPERAPI_KEY + "&url=" + urllib.parse.quote(target, safe=""))
         return http_get(url, timeout=60)
     return http_get(target)
+
+
+def scraperapi_credits_left():
+    """Returns remaining credits or None if not checkable. Used for Slack alerts."""
+    if not SCRAPERAPI_KEY:
+        return None
+    try:
+        data = http_get(f"https://api.scraperapi.com/account?api_key={SCRAPERAPI_KEY}")
+        return data.get("creditsLeft")
+    except Exception:
+        return None
 
 POSTED_LOG = ROOT / "posted.jsonl"
 RUN_LOG = ROOT / "log.txt"
@@ -329,9 +387,23 @@ def fetch_thread(reddit_url):
 def fetch_subreddit_new(subreddit, limit=25):
     """Fetch newest posts from a subreddit, return list of post dicts."""
     data = reddit_get(f"/r/{subreddit}/new.json?limit={limit}")
+    return _posts_from_listing(data)
+
+
+def reddit_search(query, sort="new", t="month", limit=25):
+    """Site-wide Reddit search. Finds threads in ANY sub matching the query.
+    sort: relevance|hot|top|new|comments  t: hour|day|week|month|year|all"""
+    q = urllib.parse.quote(query)
+    path = f"/search.json?q={q}&sort={sort}&t={t}&limit={limit}"
+    data = reddit_get(path)
+    return _posts_from_listing(data)
+
+
+def _posts_from_listing(data):
     posts = []
-    for child in data["data"]["children"]:
-        if child["kind"] != "t3":
+    children = (data.get("data") or {}).get("children") or []
+    for child in children:
+        if child.get("kind") != "t3":
             continue
         p = child["data"]
         if p.get("stickied") or p.get("locked") or p.get("archived"):
