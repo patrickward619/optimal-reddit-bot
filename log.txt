@@ -192,3 +192,12 @@
 2026-05-30T13:05:41.576121+00:00    refund 6a1873c2ce02e1a44983f586 r/evbetting $10: refunded
 2026-05-30T13:05:41.576502+00:00  Refund sweep: 2 refunded ($20), 0 errored, 54 outside 72h window, 32 already refunded, 32 not removed.
 2026-05-30T13:05:41.751322+00:00  === refund_bot run end ===
+2026-05-31T12:05:47.011272+00:00  === discover run start ===
+2026-05-31T12:06:43.218687+00:00    fetch failed for r/evbetting: HTTP Error 500: Internal Server Error
+2026-05-31T12:07:38.907754+00:00    fetch failed for r/positiveevbetting: HTTP Error 500: Internal Server Error
+2026-05-31T12:08:34.217823+00:00    fetch failed for r/arbitragebetting: HTTP Error 500: Internal Server Error
+2026-05-31T12:09:29.555296+00:00    fetch failed for r/algobetting: HTTP Error 500: Internal Server Error
+2026-05-31T12:10:25.858858+00:00    fetch failed for r/dfsports: HTTP Error 500: Internal Server Error
+2026-05-31T12:11:22.141678+00:00    fetch failed for r/sportsbettingpicks: HTTP Error 500: Internal Server Error
+2026-05-31T12:12:18.506292+00:00    fetch failed for r/sportsbetting: HTTP Error 500: Internal Server Error
+2026-05-31T12:12:18.506815+00:00  === discover end: 0 threads written to _reddit_discovery.csv ===
