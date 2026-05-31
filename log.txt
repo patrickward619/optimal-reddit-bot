@@ -201,3 +201,7 @@
 2026-05-31T12:11:22.141678+00:00    fetch failed for r/sportsbettingpicks: HTTP Error 500: Internal Server Error
 2026-05-31T12:12:18.506292+00:00    fetch failed for r/sportsbetting: HTTP Error 500: Internal Server Error
 2026-05-31T12:12:18.506815+00:00  === discover end: 0 threads written to _reddit_discovery.csv ===
+2026-05-31T13:17:12.584172+00:00  === refund_bot run start ===
+2026-05-31T13:17:13.677402+00:00  fetched 152 tasks
+2026-05-31T13:17:13.677836+00:00  Refund sweep: 0 refunded ($0), 0 errored, 54 outside 72h window, 34 already refunded, 32 not removed.
+2026-05-31T13:17:13.792158+00:00  === refund_bot run end ===
