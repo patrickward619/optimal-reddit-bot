@@ -320,3 +320,8 @@
 2026-06-22T16:29:44.426725+00:00  fetched 153 tasks
 2026-06-22T16:29:44.427035+00:00  Refund sweep: 0 refunded ($0), 0 errored, 55 outside 72h window, 34 already refunded, 31 not removed.
 2026-06-22T16:29:44.513934+00:00  === refund_bot run end ===
+2026-06-23T14:29:19.700707+00:00  === refund_bot run start ===
+2026-06-23T14:29:20.796896+00:00  fetched 153 tasks
+2026-06-23T14:29:22.194559+00:00    refund 6a3807afb902c4592385fa38 r/evbetting $10: Instant comment upvotes on a thread older than 30 days is non refundable
+2026-06-23T14:29:22.194934+00:00  Refund sweep: 0 refunded ($0), 1 errored, 55 outside 72h window, 34 already refunded, 30 not removed.
+2026-06-23T14:29:22.282967+00:00  === refund_bot run end ===
