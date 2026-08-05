@@ -547,3 +547,7 @@
 2026-08-04T13:49:14.733670+00:00  fetched 153 tasks
 2026-08-04T13:49:14.733937+00:00  Refund sweep: 0 refunded ($0), 0 errored, 59 outside 72h window, 34 already refunded, 26 not removed.
 2026-08-04T13:49:14.969486+00:00  === refund_bot run end ===
+2026-08-05T13:44:36.807925+00:00  === refund_bot run start ===
+2026-08-05T13:44:39.512420+00:00  fetched 153 tasks
+2026-08-05T13:44:39.512779+00:00  Refund sweep: 0 refunded ($0), 0 errored, 59 outside 72h window, 34 already refunded, 26 not removed.
+2026-08-05T13:44:39.705177+00:00  === refund_bot run end ===
