@@ -637,3 +637,12 @@
 2026-08-22T12:19:56.299237+00:00  fetched 153 tasks
 2026-08-22T12:19:56.299612+00:00  Refund sweep: 0 refunded ($0), 0 errored, 59 outside 72h window, 34 already refunded, 26 not removed.
 2026-08-22T12:19:56.571886+00:00  === refund_bot run end ===
+2026-08-23T11:10:41.872550+00:00  === discover run start ===
+2026-08-23T11:11:38.622554+00:00    fetch failed for r/evbetting: HTTP Error 500: Internal Server Error
+2026-08-23T11:12:34.750565+00:00    fetch failed for r/positiveevbetting: HTTP Error 500: Internal Server Error
+2026-08-23T11:13:30.921340+00:00    fetch failed for r/arbitragebetting: HTTP Error 500: Internal Server Error
+2026-08-23T11:14:26.759899+00:00    fetch failed for r/algobetting: HTTP Error 500: Internal Server Error
+2026-08-23T11:15:22.171104+00:00    fetch failed for r/dfsports: HTTP Error 500: Internal Server Error
+2026-08-23T11:16:17.796771+00:00    fetch failed for r/sportsbettingpicks: HTTP Error 500: Internal Server Error
+2026-08-23T11:17:14.559053+00:00    fetch failed for r/sportsbetting: HTTP Error 500: Internal Server Error
+2026-08-23T11:17:14.559684+00:00  === discover end: 0 threads written to _reddit_discovery.csv ===
