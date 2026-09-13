@@ -748,3 +748,12 @@
 2026-09-12T14:40:18.622973+00:00  fetched 153 tasks
 2026-09-12T14:40:18.623276+00:00  Refund sweep: 0 refunded ($0), 0 errored, 59 outside 72h window, 34 already refunded, 26 not removed.
 2026-09-12T14:40:18.940930+00:00  === refund_bot run end ===
+2026-09-13T14:43:32.290816+00:00  === discover run start ===
+2026-09-13T14:44:32.637903+00:00    fetch failed for r/evbetting: The read operation timed out
+2026-09-13T14:45:32.829851+00:00    fetch failed for r/positiveevbetting: The read operation timed out
+2026-09-13T14:46:32.991280+00:00    fetch failed for r/arbitragebetting: The read operation timed out
+2026-09-13T14:47:33.117811+00:00    fetch failed for r/algobetting: The read operation timed out
+2026-09-13T14:48:33.261804+00:00    fetch failed for r/dfsports: The read operation timed out
+2026-09-13T14:49:33.424623+00:00    fetch failed for r/sportsbettingpicks: The read operation timed out
+2026-09-13T14:50:33.685788+00:00    fetch failed for r/sportsbetting: The read operation timed out
+2026-09-13T14:50:33.686154+00:00  === discover end: 0 threads written to _reddit_discovery.csv ===
