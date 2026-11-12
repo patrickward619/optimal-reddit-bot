@@ -1069,3 +1069,7 @@
 2026-11-11T19:01:13.297435+00:00  fetched 153 tasks
 2026-11-11T19:01:13.297743+00:00  Refund sweep: 0 refunded ($0), 0 errored, 59 outside 72h window, 34 already refunded, 26 not removed.
 2026-11-11T19:01:13.389145+00:00  === refund_bot run end ===
+2026-11-12T19:20:02.982478+00:00  === refund_bot run start ===
+2026-11-12T19:20:05.637199+00:00  fetched 153 tasks
+2026-11-12T19:20:05.637395+00:00  Refund sweep: 0 refunded ($0), 0 errored, 59 outside 72h window, 34 already refunded, 26 not removed.
+2026-11-12T19:20:06.468866+00:00  === refund_bot run end ===
